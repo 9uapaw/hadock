@@ -1,1 +1,4 @@
-fire
+typer
+pyserde
+docker
+sh
