@@ -3,6 +3,7 @@ import logging
 import pathlib
 import json
 import shutil
+import threading
 from dataclasses import dataclass, field
 from os import mkdir
 from typing import List, Dict, Optional
@@ -129,7 +130,7 @@ def run(path: pathlib.Path = pathlib.Path(DEFAULT_DIR, DEFAULT_COMPOSE_YML)):
 
     :param path: path of the docker-compose yaml config file
     """
-    res = sh.bash(c=f"docker-compose -f {str(path)} up", _bg=True, _out=logger.info, _err=logger.warning)
+    res = sh.bash(c=f"docker-compose -f {str(path)} up", _bg=True, _out=lambda line: logger.info(line.replace("\n", "")), _err=lambda line: logger.warning(line.replace("\n", "")))
     res.wait()
 
 
@@ -141,10 +142,15 @@ def stop():
     """
     base_image_id = docker_client.images.list(BASE_IMAGE)[0].id
     containers = docker_client.containers.list(filters={"ancestor": base_image_id})
+    threads = []
 
     for container in containers:
         logger.info("Stopping container %s", container)
-        container.stop()
+        t = threading.Thread(target=lambda: container.stop())
+        t.start()
+        threads.append(t)
+
+    [t.join() for t in threads]
 
 
 if __name__ == "__main__":
