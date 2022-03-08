@@ -124,13 +124,18 @@ def setup(host_mount_path: pathlib.Path, compose_path: pathlib.Path = pathlib.Pa
 
 
 @app.command()
-def run(path: pathlib.Path = pathlib.Path(DEFAULT_DIR, DEFAULT_COMPOSE_YML)):
+def run(path: pathlib.Path = pathlib.Path(DEFAULT_DIR, DEFAULT_COMPOSE_YML), log: bool = True):
     """
     Runs Hadock with the given docker-compose yaml config file.
 
     :param path: path of the docker-compose yaml config file
     """
-    res = sh.bash(c=f"docker-compose -f {str(path)} up", _bg=True, _out=lambda line: logger.info(line.replace("\n", "")), _err=lambda line: logger.warning(line.replace("\n", "")))
+    logger.info("Starting Hadock with compose file: %s", path)
+    if log:
+        res = sh.bash(c=f"docker-compose -f {str(path)} up", _bg=True, _out=lambda line: logger.info(line.replace("\n", "")), _err=lambda line: logger.warning(line.replace("\n", "")))
+    else:
+        res = sh.bash(c=f"docker-compose -f {str(path)} up", _bg=True)
+
     res.wait()
 
 
