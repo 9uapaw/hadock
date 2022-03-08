@@ -75,7 +75,7 @@ docker_client = docker.client.from_env()
 
 
 @app.command()
-def install(method: InstallationMethod = InstallationMethod.DYNAMIC_MOUNT):
+def install(method: InstallationMethod = InstallationMethod.DYNAMIC_MOUNT.value):
     """
     Builds all the docker images.
 
