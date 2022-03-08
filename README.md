@@ -3,24 +3,34 @@ This project is built on [Big Data Europe - Hadoop in Docker](https://github.com
 
 # Getting started
 1. Clone the repository
-2. Install the Python requirements
+
+2. Go to the project's main directory and set up a python virtualenv: 
     ```shell
-    pip install
+    python3 -m venv ./venv
     ```
-3. Build Hadock images
+
+3. Activate the virtualenv: 
     ```shell
-    python hadock.py install
+    source venv/bin/activate
     ```
-4. Setup config
+
+4. Install all the dependencies into the virtualenv: 
     ```shell
-    python hadock.py setup $HADOOP_DIST_HOME
+    python3 -m ensurepip --default-pip
+    python3 -m pip install -r requirements.txt
+    ```
+
+5. Build Hadock images
+    ```shell
+    python3 hadock.py install
+    ```
+6. Setup config
+    ```shell
+    python3 hadock.py setup $HADOOP_DIST_HOME
     ```
    > $HADOOP_DIST_HOME is generally located in $HADOOP_REPOSITORY/hadoop-dist/target/hadoop-$VERSION
                                                                     
-5. Run Hadock                                                                                   
+7. Run Hadock                                                                                   
     ```shell
-    python hadock.py run
+    python3 hadock.py run
     ```
-
-
-
