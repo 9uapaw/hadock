@@ -13,7 +13,9 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
       gnupg \
     && rm -rf /var/lib/apt/lists/*
       
-ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/
+RUN ln -sfn /usr/lib/jvm/java-8-openjdk-$([ $(uname -m) = "aarch64" ] && echo "arm64" || echo "amd64" )/ /usr/lib/jvm/java-8-openjdk
+
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk/
 
 RUN ln -s /opt/hadoop/etc/hadoop /etc/hadoop
 RUN ln -s /opt/hadoop /hadoop
