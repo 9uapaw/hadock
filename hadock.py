@@ -74,6 +74,21 @@ app = typer.Typer()
 docker_client = docker.client.from_env()
 
 
+def get_docker_compose_command():
+    """
+    Returns the correct Docker Compose command based on the installed version.
+    """
+    try:
+        sh.docker.compose("--version")
+        return "docker compose"
+    except sh.ErrorReturnCode:
+        try:
+            sh.docker-compose("--version")
+            return "docker-compose"
+        except sh.ErrorReturnCode:
+            raise RuntimeError("Neither `docker compose` nor `docker-compose` is installed.")
+
+
 @app.command()
 def install(method: InstallationMethod = InstallationMethod.DYNAMIC_MOUNT.value):
     """
@@ -130,11 +145,12 @@ def run(path: pathlib.Path = pathlib.Path(DEFAULT_DIR, DEFAULT_COMPOSE_YML), log
 
     :param path: path of the docker-compose yaml config file
     """
+    docker_compose_cmd = get_docker_compose_command()
     logger.info("Starting Hadock with compose file: %s", path)
     if log:
-        res = sh.bash(c=f"docker-compose -f {str(path)} up", _bg=True, _out=lambda line: logger.info(line.replace("\n", "")), _err=lambda line: logger.warning(line.replace("\n", "")))
+        res = sh.bash(c=f"{docker_compose_cmd} -f {str(path)} up", _bg=True, _out=lambda line: logger.info(line.replace("\n", "")), _err=lambda line: logger.warning(line.replace("\n", "")))
     else:
-        res = sh.bash(c=f"docker-compose -f {str(path)} up", _bg=True)
+        res = sh.bash(c=f"{docker_compose_cmd} -f {str(path)} up", _bg=True)
 
     res.wait()
 
